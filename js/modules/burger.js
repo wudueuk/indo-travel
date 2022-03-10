@@ -1,7 +1,23 @@
 const body = document.querySelector('body');
+
+const headerContainer = document.querySelector('.header__container');
+
 const burgerButton = document.querySelector('.header__menu-button');
+burgerButton.style.position = 'fixed';
+burgerButton.style.zIndex = '99';
+const headerWidth = (document.documentElement.clientWidth -
+  headerContainer.clientWidth) / 2 + 35;
+burgerButton.style.right = `${headerWidth}px`;
+
+window.addEventListener('resize', () => {
+  const headerWidth = (document.documentElement.clientWidth -
+    headerContainer.clientWidth) / 2 + 35;
+  burgerButton.style.right = `${headerWidth}px`;
+});
+
 const headerMenu = document.querySelector('.header__menu');
 headerMenu.style.transform = `scaleX(0)`;
+
 const menuDuration = 300;
 let startMenuAnimationTime = NaN;
 let menuScale = 0;
