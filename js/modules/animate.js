@@ -9,6 +9,7 @@ fly.style.cssText = `
   bottom: 0px;
   right: 0px;
   background: url('../img/airplane.svg') center/contain no-repeat;
+  transition: all 0.15s ease-out;
 `;
 
 document.body.append(fly);
