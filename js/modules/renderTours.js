@@ -1,4 +1,9 @@
 import getDatabaseData from './db.js';
+import sendData from './sendData.js';
+import {
+  createOverlay,
+  createModal, successModal, errorModal
+} from './modals.js';
 
 const selectDate = document.getElementById('tour__date');
 selectDate.innerHTML = `
@@ -20,7 +25,7 @@ reservPeople.innerHTML = `
   <option value="" class="tour__option">Количество человек</option>
 `;
 
-const reservTourDate = document.querySelector('.reservation__data');
+// const reservTourDate = document.querySelector('.reservation__data');
 const reservPrice = document.querySelector('.reservation__price');
 
 const renderTour = async () => {
@@ -78,6 +83,49 @@ const renderTour = async () => {
     }
   });
 
+  reservDate.addEventListener('change', () => {
+    selectPeople.textContent = '';
+    reservPeople.textContent = '';
+
+    if (reservDate.value === '0') {
+      selectPeople.innerHTML = `
+        <option value="" class="tour__option">Количество человек</option>
+      `;
+      reservPeople.innerHTML = `
+        <option value="" class="tour__option">Количество человек</option>
+      `;
+    } else {
+      const selected = data.find(elem => {
+        if (elem.date === reservDate.value) {
+          return elem['min-people'], elem['max-people'];
+        }
+      });
+
+      for (let i = selected['min-people']; i <= selected['max-people']; i++) {
+        selectPeople.innerHTML += `
+          <option value="${i}" class="tour__option">${i}</option>
+        `;
+        reservPeople.innerHTML += `
+          <option value="${i}" class="tour__option">${i}</option>
+        `;
+      }
+
+      data.map(item => {
+        if (item.date === reservDate.value) {
+          selectDate.innerHTML += `
+            <option value="${item.date}" class="tour__option" 
+              selected>${item.date}</option>
+          `;
+        } else {
+          selectDate.innerHTML += `
+            <option value="${item.date}" 
+              class="tour__option">${item.date}</option>
+          `;
+        }
+      });
+    }
+  });
+
   selectPeople.addEventListener('change', () => {
     reservPeople.textContent = '';
 
@@ -106,7 +154,7 @@ const renderTour = async () => {
     selectPeople.textContent = '';
 
     const selected = data.find(elem => {
-      if (elem.date === selectDate.value) {
+      if (elem.date === reservDate.value) {
         return elem['min-people'], elem['max-people'], elem.price;
       }
     });
@@ -128,3 +176,23 @@ const renderTour = async () => {
 };
 
 renderTour();
+
+// Отправка формы бронирования
+const reservForm = document.querySelector('.reservation__form');
+reservForm.addEventListener('submit', e => {
+  e.preventDefault();
+
+  sendData({
+    title: reservForm.dates.value,
+    body: reservForm.people.value,
+  }, (data) => {
+    const overlay = createOverlay();
+    if (!data.id) {
+      const success = createModal(successModal());
+      document.body.append(overlay, success);
+    } else {
+      const unsuccess = createModal(errorModal());
+      document.body.append(overlay, unsuccess);
+    }
+  });
+});
