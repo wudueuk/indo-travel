@@ -187,7 +187,7 @@ reservForm.addEventListener('submit', e => {
     body: reservForm.people.value,
   }, (data) => {
     const overlay = createOverlay();
-    if (!data.id) {
+    if (data.id) {
       const success = createModal(successModal());
       document.body.append(overlay, success);
     } else {
