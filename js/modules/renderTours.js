@@ -25,7 +25,6 @@ reservPeople.innerHTML = `
   <option value="" class="tour__option">Количество человек</option>
 `;
 
-// const reservTourDate = document.querySelector('.reservation__data');
 const reservPrice = document.querySelector('.reservation__price');
 
 const renderTour = async () => {
