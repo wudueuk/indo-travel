@@ -9,7 +9,7 @@ import {
   timerUnitsMinutes,
 } from './setElements.js';
 
-import { parseNumber, parseWords } from './parse.js';
+import {parseNumber, parseWords} from './parse.js';
 
 const timer = () => {
   // Время окончания акции по локальному времени
@@ -25,7 +25,7 @@ const timer = () => {
     const hours = Math.floor(timeRemaining / 1000 / 60 / 60 % 24);
     const minutes = Math.floor(timeRemaining / 1000 / 60 % 60);
 
-    return { timeRemaining, days, hours, minutes };
+    return {timeRemaining, days, hours, minutes};
   };
 
   const startTimer = () => {
@@ -37,7 +37,7 @@ const timer = () => {
     timerUnitsHours.textContent = parseNumber(+timer.hours, parseWords.hours);
     timerCountMinutes.textContent = timer.minutes;
     timerUnitsMinutes.textContent = parseNumber(+timer.minutes,
-      parseWords.minutes);
+        parseWords.minutes);
 
     const timerId = setTimeout(startTimer, 30000);
 

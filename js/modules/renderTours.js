@@ -1,197 +1,143 @@
 import getDatabaseData from './db.js';
-import sendData from './sendData.js';
+import { showModal, createOverlay, errorModal } from './modals.js';
 import {
-  createOverlay,
-  createModal, successModal, errorModal
-} from './modals.js';
+  selectDate,
+  reservDate,
+  selectPeople,
+  reservPeople,
+  reservPrice,
+  reservForm,
+} from './setElements.js';
+import httpRequest from './sendData.js';
 
-const selectDate = document.getElementById('tour__date');
-selectDate.innerHTML = `
-  <option value="0" class="tour__option">Выбери дату</option>
-`;
+const URL = 'https://jsonplaceholder.typicode.com/posts';
 
-const reservDate = document.getElementById('reservation__date');
-reservDate.innerHTML = `
-  <option value="0" class="tour__option">Дата путешествия</option>
-`;
+const resetSelects = () => {
+  selectPeople.innerHTML = `
+      <option value="" class="tour__option">Количество человек</option>
+  `;
+  reservPeople.innerHTML = `
+      <option value="" class="tour__option">Количество человек</option>
+  `;
+};
 
-const selectPeople = document.getElementById('tour__people');
-selectPeople.innerHTML = `
-  <option value="" class="tour__option">Количество человек</option>
-`;
+const addInSelect = (selectName, value) => {
+  selectName.innerHTML += `
+    <option value="${value}" class="tour__option">${value}</option>
+  `;
+};
 
-const reservPeople = document.getElementById('reservation__people');
-reservPeople.innerHTML = `
-  <option value="" class="tour__option">Количество человек</option>
-`;
+const updatePeopleSelect = (select1, select2, dates, data) => {
+  select1.textContent = '';
 
-const reservPrice = document.querySelector('.reservation__price');
+  const selected = data.find(elem => {
+    if (elem.date === dates.value) {
+      return elem['min-people'], elem['max-people'], elem.price;
+    }
+  });
+
+  for (let i = selected['min-people']; i <= selected['max-people']; i++) {
+    if (i === +select2.value) {
+      select1.innerHTML += `
+        <option value="${i}" class="tour__option" selected>${i}</option>
+      `;
+    } else {
+      addInSelect(select1, i);
+    }
+  }
+
+  reservPrice.textContent = `${selectPeople.value * selected.price}₽`;
+};
+
+const updateDateSelect = (select1, select2, data) => {
+  selectPeople.textContent = '';
+  reservPeople.textContent = '';
+
+  if (select1.value === '0') {
+    resetSelects();
+  } else {
+    const selected = data.find(elem => {
+      if (elem.date === select1.value) {
+        return elem['min-people'], elem['max-people'], elem.price;
+      }
+    });
+
+    for (let i = selected['min-people']; i <= selected['max-people']; i++) {
+      addInSelect(selectPeople, i);
+      addInSelect(reservPeople, i);
+    }
+
+    data.map(item => {
+      if (item.date === select1.value) {
+        select2.innerHTML += `
+            <option value="${item.date}" class="tour__option" 
+              selected>${item.date}</option>
+          `;
+      } else {
+        addInSelect(select2, item.date);
+      }
+    });
+
+    reservPrice.textContent = `${reservPeople.value * selected.price}₽`;
+  }
+};
+
+const showErrorModal = (err, data) => {
+  createOverlay();
+  errorModal();
+  console.log(err);
+};
 
 const renderTour = async () => {
   const data = await getDatabaseData();
 
   data.map(item => {
-    selectDate.innerHTML += `
-      <option value="${item.date}" class="tour__option">${item.date}</option>
-    `;
-    reservDate.innerHTML += `
-      <option value="${item.date}" class="tour__option">${item.date}</option>
-    `;
+    addInSelect(selectDate, item.date);
+    addInSelect(reservDate, item.date);
   });
 
   selectDate.addEventListener('change', () => {
-    selectPeople.textContent = '';
-    reservPeople.textContent = '';
-
-    if (selectDate.value === '0') {
-      selectPeople.innerHTML = `
-        <option value="" class="tour__option">Количество человек</option>
-      `;
-      reservPeople.innerHTML = `
-        <option value="" class="tour__option">Количество человек</option>
-      `;
-    } else {
-      const selected = data.find(elem => {
-        if (elem.date === selectDate.value) {
-          return elem['min-people'], elem['max-people'];
-        }
-      });
-
-      for (let i = selected['min-people']; i <= selected['max-people']; i++) {
-        selectPeople.innerHTML += `
-          <option value="${i}" class="tour__option">${i}</option>
-        `;
-        reservPeople.innerHTML += `
-          <option value="${i}" class="tour__option">${i}</option>
-        `;
-      }
-
-      data.map(item => {
-        if (item.date === selectDate.value) {
-          reservDate.innerHTML += `
-            <option value="${item.date}" class="tour__option" 
-              selected>${item.date}</option>
-          `;
-        } else {
-          reservDate.innerHTML += `
-            <option value="${item.date}" 
-              class="tour__option">${item.date}</option>
-          `;
-        }
-      });
-    }
+    updateDateSelect(selectDate, reservDate, data);
   });
 
   reservDate.addEventListener('change', () => {
-    selectPeople.textContent = '';
-    reservPeople.textContent = '';
-
-    if (reservDate.value === '0') {
-      selectPeople.innerHTML = `
-        <option value="" class="tour__option">Количество человек</option>
-      `;
-      reservPeople.innerHTML = `
-        <option value="" class="tour__option">Количество человек</option>
-      `;
-    } else {
-      const selected = data.find(elem => {
-        if (elem.date === reservDate.value) {
-          return elem['min-people'], elem['max-people'];
-        }
-      });
-
-      for (let i = selected['min-people']; i <= selected['max-people']; i++) {
-        selectPeople.innerHTML += `
-          <option value="${i}" class="tour__option">${i}</option>
-        `;
-        reservPeople.innerHTML += `
-          <option value="${i}" class="tour__option">${i}</option>
-        `;
-      }
-
-      data.map(item => {
-        if (item.date === reservDate.value) {
-          selectDate.innerHTML += `
-            <option value="${item.date}" class="tour__option" 
-              selected>${item.date}</option>
-          `;
-        } else {
-          selectDate.innerHTML += `
-            <option value="${item.date}" 
-              class="tour__option">${item.date}</option>
-          `;
-        }
-      });
-    }
+    updateDateSelect(reservDate, selectDate, data);
   });
 
   selectPeople.addEventListener('change', () => {
-    reservPeople.textContent = '';
-
-    const selected = data.find(elem => {
-      if (elem.date === selectDate.value) {
-        return elem['min-people'], elem['max-people'], elem.price;
-      }
-    });
-
-    for (let i = selected['min-people']; i <= selected['max-people']; i++) {
-      if (i === +selectPeople.value) {
-        reservPeople.innerHTML += `
-          <option value="${i}" class="tour__option" selected>${i}</option>
-        `;
-      } else {
-        reservPeople.innerHTML += `
-          <option value="${i}" class="tour__option">${i}</option>
-        `;
-      }
-    }
-
-    reservPrice.textContent = `${selectPeople.value * selected.price}₽`;
+    updatePeopleSelect(reservPeople, selectPeople, reservDate, data);
   });
 
   reservPeople.addEventListener('change', () => {
-    selectPeople.textContent = '';
-
-    const selected = data.find(elem => {
-      if (elem.date === reservDate.value) {
-        return elem['min-people'], elem['max-people'], elem.price;
-      }
-    });
-
-    for (let i = selected['min-people']; i <= selected['max-people']; i++) {
-      if (i === +reservPeople.value) {
-        selectPeople.innerHTML += `
-          <option value="${i}" class="tour__option" selected>${i}</option>
-        `;
-      } else {
-        selectPeople.innerHTML += `
-          <option value="${i}" class="tour__option">${i}</option>
-        `;
-      }
-    }
-
-    reservPrice.textContent = `${reservPeople.value * selected.price}₽`;
+    updatePeopleSelect(selectPeople, reservPeople, selectDate, data);
   });
 };
 
 renderTour();
 
-// Отправка формы бронирования
-const reservForm = document.querySelector('.reservation__form');
-reservForm.addEventListener('submit', e => {
+reservForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  sendData({
-    title: reservForm.dates.value,
-    body: reservForm.people.value,
-  }, (data) => {
-    const overlay = createOverlay();
-    if (data.id) {
-      const success = createModal(successModal());
-      document.body.append(overlay, success);
-    } else {
-      const unsuccess = createModal(errorModal());
-      document.body.append(overlay, unsuccess);
-    }
-  });
+  const tourData = {
+    period: reservDate.value,
+    people: reservPeople.value,
+    price: reservPrice.textContent,
+    phone: reservForm.querySelector('#reservation__phone').value,
+    client: reservForm.querySelector('.reservation__input_name').value,
+  };
+
+  const orderResult = await showModal(tourData);
+
+  if (orderResult) {
+    console.log('Заказ подтвержден');
+    httpRequest(URL, {
+      method: 'POST',
+      title: 'Подтверждение заказа',
+      callback: showErrorModal,
+      body: tourData,
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    });
+  }
 });

@@ -1,6 +1,6 @@
 const body = document.querySelector('body');
 
-//const headerContainer = document.querySelector('.header__container');
+// const headerContainer = document.querySelector('.header__container');
 
 const burgerButton = document.querySelector('.header__menu-button');
 /* burgerButton.style.position = 'fixed';

@@ -1,19 +1,42 @@
-const sendData = (body, callback) => {
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', 'https://jsonplaceholder.typicode.com/posts');
+const httpRequest = ((url, {
+  method = 'GET',
+  callback,
+  title = '',
+  body = {},
+  headers,
+}) => {
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
 
-  xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    if (headers) {
+      for (const [key, value] of Object.entries(headers)) {
+        xhr.setRequestHeader(key, value);
+      }
+    }
 
-  xhr.addEventListener('load', () => {
-    const data = JSON.parse(xhr.response);
-    callback(data);
-  });
+    xhr.addEventListener('load', () => {
+      if (xhr.status < 200 || xhr.status >= 300) {
+        callback(new Error(xhr.status), xhr.response);
+        return;
+      }
 
-  xhr.addEventListener('error', () => {
-    console.log('error');
-  });
+      const data = JSON.parse(xhr.response);
+      // if (callback) callback(null, data);
+    });
 
-  xhr.send(JSON.stringify(body));
-};
+    xhr.addEventListener('error', () => {
+      callback(new Error(xhr.status), xhr.response);
+    });
 
-export default sendData;
+    const query = {
+      title,
+      body,
+    };
+    xhr.send(JSON.stringify(query));
+  } catch (err) {
+    callback(new Error(err));
+  }
+});
+
+export default httpRequest;

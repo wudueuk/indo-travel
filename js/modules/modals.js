@@ -1,3 +1,51 @@
+import loadStyle from './loadStyle.js';
+
+export const showModal = async (tourData) => {
+  await loadStyle('css/modal.css');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay overlay_confirm';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <h2 class="modal__title">Подтверждение заявки</h2>
+    <p class="modal__text">Бронирование путешествия в Индонезию
+      на ${tourData.people} человек(а)</p>
+    <p class="modal__text">В даты: ${tourData.period}</p>
+    <p class="modal__text">Стоимость тура ${tourData.price}</p>
+  `;
+
+  const buttonGroup = document.createElement('div');
+  buttonGroup.className = 'modal__button';
+
+  const buttonConfirm = document.createElement('button');
+  buttonConfirm.className = 'modal__btn modal__btn_confirm';
+  buttonConfirm.textContent = 'Подтверждаю';
+
+  const buttonEdit = document.createElement('button');
+  buttonEdit.className = 'modal__btn modal__btn_edit';
+  buttonEdit.textContent = 'Изменить данные';
+
+  buttonGroup.append(buttonConfirm, buttonEdit);
+  modal.append(buttonGroup);
+  overlay.append(modal);
+
+  document.body.append(overlay);
+
+  return new Promise(resolve => {
+    buttonConfirm.addEventListener('click', () => {
+      overlay.remove();
+      resolve(true);
+    });
+
+    buttonEdit.addEventListener('click', () => {
+      overlay.remove();
+      resolve(false);
+    });
+  });
+};
+
 export const createOverlay = () => {
   const overlay = document.createElement('div');
   overlay.id = 'overlay';
@@ -12,12 +60,12 @@ export const createOverlay = () => {
     z-index: 9;
   `;
 
-  return overlay;
+  document.body.append(overlay);
 };
 
-export const createModal = body => {
-  const modalWindow = document.createElement('div');
-  modalWindow.style.cssText = `
+export const errorModal = () => {
+  const modal = document.createElement('div');
+  modal.style.cssText = `
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -30,50 +78,6 @@ export const createModal = body => {
     z-index: 10;
   `;
 
-  modalWindow.append(body);
-
-  return modalWindow;
-};
-
-
-export const successModal = () => {
-  const body = document.createElement('div');
-  body.style.cssText = `
-    width: 980px;
-    background-color: #FFF;
-    padding: 77px 200px 85px;
-    border: 1px solid #AFAFAF;
-    border-radius: 30px;
-    opacity: 1;
-    text-align: center;
-  `;
-  body.innerHTML = `
-    <h2 class="reservation__title">Ваша заявка успешно отправлена</h2>
-    <p class="reservation__data">Наши менеджеры свяжутся с вами в течение 
-    3-х рабочих дней</p>
-  `;
-
-  const button = document.createElement('button');
-  button.style.cssText = `margin-top: 60px`;
-  button.innerHTML = `
-    <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="50" fill="#78EC6E"/>
-      <path d="M42.2618 60.8332L31.4285 49.9999L27.8174 53.611L42.2618 
-      68.0554L73.2142 37.1031L69.6031 33.4919L42.2618 60.8332Z" fill="white"/>
-    </svg>
-  `;
-
-  button.addEventListener('click', () => {
-    body.parentElement.remove();
-    document.getElementById('overlay').remove();
-  });
-
-  body.append(button);
-
-  return body;
-};
-
-export const errorModal = () => {
   const body = document.createElement('div');
   body.style.cssText = `
     width: 980px;
@@ -93,14 +97,16 @@ export const errorModal = () => {
   const button = document.createElement('button');
   button.className = 'button reservation__button';
   button.style.cssText = `margin-top: 60px`;
-  button.textContent = 'Забронировать';
+  button.textContent = 'Закрыть';
 
   button.addEventListener('click', () => {
-    body.parentElement.remove();
+    modal.remove();
     document.getElementById('overlay').remove();
   });
 
   body.append(button);
 
-  return body;
+  modal.append(body);
+
+  document.body.append(modal);
 };
