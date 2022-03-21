@@ -7,6 +7,8 @@ import {
   reservPeople,
   reservPrice,
   reservForm,
+  reservPhone,
+  reservClient,
 } from './setElements.js';
 import httpRequest from './sendData.js';
 
@@ -122,8 +124,8 @@ reservForm.addEventListener('submit', async (e) => {
     period: reservDate.value,
     people: reservPeople.value,
     price: reservPrice.textContent,
-    phone: reservForm.querySelector('#reservation__phone').value,
-    client: reservForm.querySelector('.reservation__input_name').value,
+    phone: reservPhone.value,
+    client: reservClient.value,
   };
 
   const orderResult = await showModal(tourData);
