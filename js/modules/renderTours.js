@@ -132,6 +132,7 @@ reservForm.addEventListener('submit', async (e) => {
 
   if (orderResult) {
     console.log('Заказ подтвержден');
+    reservForm.reset();
     httpRequest(URL, {
       method: 'POST',
       title: 'Подтверждение заказа',
