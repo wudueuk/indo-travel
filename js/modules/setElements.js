@@ -1,3 +1,5 @@
+import Inputmask from '../../node_modules/inputmask/dist/inputmask.es6.js';
+
 export const heroText = document.querySelector('.hero__text');
 
 export const heroTimer = document.querySelector('.hero__timer');
@@ -42,19 +44,10 @@ export const reservPrice = reservForm.querySelector('.reservation__price');
 reservPrice.textContent = '0₽';
 
 export const reservPhone = document.querySelector('#reservation__phone');
-reservPhone.addEventListener('input', () => {
-  reservPhone.value = reservPhone.value.replace(/[^\d\+]/g, '');
-});
+const phoneMask = new Inputmask('+7 (999) 999-99-99');
+phoneMask.mask(reservPhone);
 
-const reservButton = document.querySelector('.reservation__button');
-reservButton.disabled = true;
+/* const reservButton = document.querySelector('.reservation__button'); */
 
 export const reservClient = document.querySelector('.reservation__input_name');
-reservClient.addEventListener('input', () => {
-  reservClient.value = reservClient.value.replace(/[^А-Яа-яЁё^\s]/g, '');
-  if (reservClient.value
-    .match(/([А-Яа-яЁё]+)\s([А-Яа-яЁё]+)\s([А-Яа-яЁё]+)/g)) {
-    reservButton.disabled = false;
-    console.log('good');
-  }
-});
+

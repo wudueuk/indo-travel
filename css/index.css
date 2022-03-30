@@ -1471,62 +1471,62 @@ p {
 }
 
 .album {
-		padding: 75px 0;
+	padding: 75px 0;
+}
+
+.slider__wrapper {
+  position: relative;
 }
 
 .album__slider {
-		position: relative;
+	position: relative;
 }
 
 .album__item {
-		width: auto;
+	width: auto;
+}
+
+.album__left,
+.album__right {
+  position: absolute;
+  content: '';
+  width: 90px;
+  height: 90px;
+  top: calc(50% - 45px);
+  z-index: 3;
+  cursor: pointer;
+  border-radius: 50%;
 }
 
 .album__left {
-		position: absolute;
-		content: "";
-		width: 90px;
-		height: 90px;
-		top: 50%;
-		left: 130px;
-		-webkit-transform: translateY(-50%);
-		-ms-transform: translateY(-50%);
-		transform: translateY(-50%);
-		background: url("../img/album/left.svg") center/contain no-repeat;
-		z-index: 3;
-		cursor: pointer;
-		border-radius: 50%;
+	left: 40px;
+/* 	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%); */
+	background: url("../img/album/left.svg") center/contain no-repeat;
 }
 
 .album__left:focus {
-		background-color: #AFAFAF;
+	background-color: #AFAFAF;
 }
 
 .album__left:active {
-		-webkit-transform: translateY(-50%) rotate(180deg);
-		-ms-transform: translateY(-50%) rotate(180deg);
-		transform: translateY(-50%) rotate(180deg);
-		background: url("../img/album/arrow-right-active.svg") center/contain no-repeat;
+  -webkit-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+  background: url("../img/album/arrow-right-active.svg") center/contain no-repeat;
 }
 
 .album__right {
-		position: absolute;
-		content: "";
-		width: 90px;
-		height: 90px;
-		top: 50%;
-		right: 130px;
-		-webkit-transform: translateY(-50%);
-		-ms-transform: translateY(-50%);
-		transform: translateY(-50%);
-		background: url("../img/album/right.svg") center/contain no-repeat;
-		z-index: 3;
-		cursor: pointer;
-		border-radius: 50%;
+	right: 130px;
+/* 	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%); */
+	background: url("../img/album/right.svg") center/contain no-repeat;
 }
 
 .album__right:focus {
-		background-color: #AFAFAF;
+	background-color: #AFAFAF;
 }
 
 .album__right:active {

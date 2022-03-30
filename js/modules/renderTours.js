@@ -1,5 +1,5 @@
 import getDatabaseData from './db.js';
-import { showModal, createOverlay, errorModal } from './modals.js';
+import {showModal, createOverlay, errorModal} from './modals.js';
 import {
   selectDate,
   reservDate,
@@ -11,6 +11,8 @@ import {
   reservClient,
 } from './setElements.js';
 import httpRequest from './sendData.js';
+import JustValidate
+  from '../../node_modules/just-validate/dist/just-validate.es.js';
 
 const URL = 'https://jsonplaceholder.typicode.com/posts';
 
@@ -117,30 +119,89 @@ const renderTour = async () => {
 
 renderTour();
 
-reservForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const tourData = {
-    period: reservDate.value,
-    people: reservPeople.value,
-    price: reservPrice.textContent,
-    phone: reservPhone.value,
-    client: reservClient.value,
-  };
-
-  const orderResult = await showModal(tourData);
-
-  if (orderResult) {
-    console.log('Заказ подтвержден');
-    reservForm.reset();
-    httpRequest(URL, {
-      method: 'POST',
-      title: 'Подтверждение заказа',
-      callback: showErrorModal,
-      body: tourData,
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
+const justValidate = new JustValidate('.reservation__form');
+justValidate
+    .addField('#reservation__date',
+        [
+          {
+            rule: 'required',
+            errorMessage: 'Выберите дату',
+          },
+          {
+            rule: 'minLength',
+            value: 5,
+            errorMessage: 'Некорректное значение',
+          },
+        ])
+    .addField('#reservation__people',
+        [
+          {
+            rule: 'required',
+            errorMessage: 'Некорректное значение',
+          },
+          {
+            rule: 'minLength',
+            value: 1,
+            errorMessage: 'Некорректное значение',
+          },
+        ])
+    .addField('.reservation__input_name', [
+      {
+        rule: 'required',
+        errorMessage: 'Укажите ФИО полностью по-русски',
       },
+      {
+        rule: 'minLength',
+        value: 5,
+        errorMessage: 'Слишком короткое значение',
+      },
+      {
+        rule: 'maxLength',
+        value: 30,
+        errorMessage: 'Слишком длинное значение',
+      },
+      {
+        rule: 'customRegexp',
+        value: /([А-Яа-яЁё]+)\s([А-Яа-яЁё]+)\s([А-Яа-яЁё]+)/g,
+        errorMessage: 'Некорректное значение',
+      },
+    ])
+    .addField('#reservation__phone', [
+      {
+        rule: 'required',
+        errorMessage: 'Укажите свой телефон',
+      },
+      {
+        validator(value) {
+          const phone = reservPhone.inputmask.unmaskedvalue();
+          return !!(Number(phone) && phone.length === 10);
+        },
+      },
+    ])
+    .onSuccess(async (e) => {
+      e.preventDefault();
+
+      const tourData = {
+        period: reservDate.value,
+        people: reservPeople.value,
+        price: reservPrice.textContent,
+        phone: reservPhone.value,
+        client: reservClient.value,
+      };
+
+      const orderResult = await showModal(tourData);
+
+      if (orderResult) {
+        console.log('Заказ подтвержден');
+        reservForm.reset();
+        httpRequest(URL, {
+          method: 'POST',
+          title: 'Подтверждение заказа',
+          callback: showErrorModal,
+          body: tourData,
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+          },
+        });
+      }
     });
-  }
-});

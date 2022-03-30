@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "axios": "^0.26.1",
+    "inputmask": "^5.0.7",
+    "just-validate": "^3.5.1",
+    "swiper": "^8.0.7"
+  }
+}
